@@ -1,10 +1,10 @@
-// components/kanban/Board.tsx
 'use client';
 
 import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { Issue } from 'next/dist/build/swc/types';
 import { useState } from 'react';
-// ... other imports
+import Column from './Column';
 
 export default function KanbanBoard({ projectId }: { projectId: string }) {
     const [issues, setIssues] = useState<Issue[]>([]);
