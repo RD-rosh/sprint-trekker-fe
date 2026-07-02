@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Loader2, GitBranch, Mail } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -59,8 +60,8 @@ export default function LoginPage() {
                 {/* Logo / Brand */}
                 <div className="flex justify-center mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <span className="text-white font-bold text-2xl">S</span>
+                        <div className="w-10 h-10 rounded-xl overflow-hidden">
+                            <Image src="/icon.svg" alt="SprintTrekker" width={40} height={40} />
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight text-white">Sprint Trekker</h1>
                     </div>
