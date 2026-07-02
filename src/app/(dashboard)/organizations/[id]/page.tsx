@@ -135,7 +135,7 @@ export default function OrganizationPage() {
                         <div className="col-span-full text-center py-20 border border-dashed border-zinc-800 rounded-2xl">
                             <p className="text-xl text-zinc-400">No projects yet</p>
                             <p className="text-sm text-zinc-500 mt-2">Create your first project in this organization</p>
-                            <Button className="mt-6">Create First Project</Button>
+                            <Button className="mt-6" onClick={() => router.push(`/organizations/${orgId}/projects/new`)}>Create First Project</Button>
                         </div>
                     )}
                 </div>
