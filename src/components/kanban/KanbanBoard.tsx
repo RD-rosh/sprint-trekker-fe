@@ -11,6 +11,8 @@ import { Plus, User } from 'lucide-react';
 import IssueCard from './IssueCard';
 import Column from './Column';
 import { toast } from 'sonner';
+import { auth } from '@/lib/firebase';
+import CreateIssueDrawer from '@/components/issue/CreateIssueDrawer';
 
 const columns = [
     { id: 'BACKLOG', title: 'Backlog', color: 'zinc' },
@@ -30,10 +32,22 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
     );
 
     const fetchIssues = async () => {
-        // TODO: Replace with your API call
-        // const res = await fetch(`/api/projects/${projectId}/issues`);
-        // const data = await res.json();
-        // setIssues(data);
+        try {
+            const token = await auth.currentUser?.getIdToken();
+            const res = await fetch(`/api/projects/${projectId}/issues`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setIssues(Array.isArray(data) ? data : []);
+            } else {
+                toast.error('Failed to load issues');
+            }
+        } catch (err) {
+            toast.error('Failed to load issues');
+        }
     };
 
     useEffect(() => {
@@ -45,6 +59,7 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
         if (!over || active.id === over.id) return;
 
         const activeIssue = issues.find(i => i._id === active.id);
+        if (!activeIssue) return;
         const newStatus = over.id as string; // Column ID
 
         if (activeIssue.status !== newStatus) {
@@ -53,9 +68,17 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                 issue._id === active.id ? { ...issue, status: newStatus } : issue
             ));
 
-            // TODO: Call API to update status
             try {
-                // await fetch(`/api/issues/${active.id}`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
+                const token = await auth.currentUser?.getIdToken();
+                const res = await fetch(`/api/issues/${active.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ status: newStatus }),
+                });
+                if (!res.ok) throw new Error('Failed to update status');
                 toast.success('Issue moved successfully');
             } catch (err) {
                 toast.error('Failed to update issue');
@@ -90,9 +113,16 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
                                 ))}
                             </SortableContext>
 
-                            <Button variant="ghost" className="w-full mt-4 text-zinc-400 hover:text-white">
-                                <Plus className="mr-2 h-4 w-4" /> Add Issue
-                            </Button>
+                            <CreateIssueDrawer
+                                projectId={projectId}
+                                defaultStatus={column.id as any}
+                                onIssueCreated={fetchIssues}
+                                trigger={
+                                    <Button variant="ghost" className="w-full mt-4 text-zinc-400 hover:text-white">
+                                        <Plus className="mr-2 h-4 w-4" /> Add Issue
+                                    </Button>
+                                }
+                            />
                         </Column>
                     );
                 })}

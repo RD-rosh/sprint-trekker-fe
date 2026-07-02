@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -27,9 +27,11 @@ type IssueForm = z.infer<typeof issueSchema>;
 interface CreateIssueDrawerProps {
     projectId: string;
     onIssueCreated?: () => void;
+    defaultStatus?: 'BACKLOG' | 'TODO' | 'IN_PROGRESS' | 'DONE';
+    trigger?: React.ReactNode;
 }
 
-export default function CreateIssueDrawer({ projectId, onIssueCreated }: CreateIssueDrawerProps) {
+export default function CreateIssueDrawer({ projectId, onIssueCreated, defaultStatus, trigger }: CreateIssueDrawerProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -37,9 +39,24 @@ export default function CreateIssueDrawer({ projectId, onIssueCreated }: CreateI
         resolver: zodResolver(issueSchema),
         defaultValues: {
             priority: 'MEDIUM',
-            status: 'TODO',
+            status: defaultStatus || 'TODO',
         },
     });
+
+    const statusValue = watch('status');
+    const priorityValue = watch('priority');
+
+    // Reset form when drawer opens
+    useEffect(() => {
+        if (open) {
+            reset({
+                title: '',
+                description: '',
+                priority: 'MEDIUM',
+                status: defaultStatus || 'TODO',
+            });
+        }
+    }, [open, defaultStatus, reset]);
 
     const onSubmit = async (data: IssueForm) => {
         setLoading(true);
@@ -77,10 +94,12 @@ export default function CreateIssueDrawer({ projectId, onIssueCreated }: CreateI
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <Button className="bg-white text-black hover:bg-white/90">
-                    <Plus className="mr-2 h-4 w-4" />
-                    New Issue
-                </Button>
+                {trigger || (
+                    <Button className="bg-white text-black hover:bg-white/90">
+                        <Plus className="mr-2 h-4 w-4" />
+                        New Issue
+                    </Button>
+                )}
             </DrawerTrigger>
 
             <DrawerContent className="bg-zinc-950 border-t border-zinc-800">
@@ -117,7 +136,7 @@ export default function CreateIssueDrawer({ projectId, onIssueCreated }: CreateI
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <Label>Priority</Label>
-                                <Select onValueChange={(value) => setValue('priority', value as any)} defaultValue="MEDIUM">
+                                <Select onValueChange={(value) => setValue('priority', value as any)} value={priorityValue}>
                                     <SelectTrigger className="bg-zinc-900 border-zinc-800">
                                         <SelectValue />
                                     </SelectTrigger>
@@ -132,7 +151,7 @@ export default function CreateIssueDrawer({ projectId, onIssueCreated }: CreateI
 
                             <div>
                                 <Label>Status</Label>
-                                <Select onValueChange={(value) => setValue('status', value as any)} defaultValue="TODO">
+                                <Select onValueChange={(value) => setValue('status', value as any)} value={statusValue}>
                                     <SelectTrigger className="bg-zinc-900 border-zinc-800">
                                         <SelectValue />
                                     </SelectTrigger>

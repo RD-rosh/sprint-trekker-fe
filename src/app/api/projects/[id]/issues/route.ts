@@ -4,11 +4,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001'
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: projectId } = await params;
         const token = req.headers.get('authorization');
-        const projectId = params.id;
 
         const res = await fetch(`${API_BASE}/issues/project/${projectId}`, {
             headers: { Authorization: token || '' },
