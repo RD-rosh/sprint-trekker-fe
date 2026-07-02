@@ -27,6 +27,8 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const token = req.headers.get('authorization')?.split('Bearer ')[1];
+        if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
         const decodedToken = await adminAuth.verifyIdToken(token);
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/organizations?userId=${decodedToken.uid}`, {
