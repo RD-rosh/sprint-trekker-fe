@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User } from 'lucide-react';
 
-export default function IssueCard({ issue, isDragging = false }: { issue: any; isDragging?: boolean }) {
+export default function IssueCard({ issue, isDragging = false, onClick }: { issue: any; isDragging?: boolean; onClick?: () => void }) {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
         id: issue._id,
     });
@@ -27,7 +27,8 @@ export default function IssueCard({ issue, isDragging = false }: { issue: any; i
             style={style}
             {...attributes}
             {...listeners}
-            className={`p-4 cursor-grab active:cursor-grabbing bg-zinc-950 border-zinc-800 hover:border-zinc-700 transition-all ${isDragging ? 'scale-105 shadow-2xl' : ''}`}
+            onClick={onClick}
+            className={`p-4 cursor-pointer hover:border-zinc-700 transition-all ${isDragging ? 'scale-105 shadow-2xl opacity-50 cursor-grabbing' : 'cursor-grab active:cursor-grabbing'} bg-zinc-950 border-zinc-800`}
         >
             <div className="flex justify-between items-start mb-3">
                 <p className="font-medium text-sm leading-snug">{issue.title}</p>

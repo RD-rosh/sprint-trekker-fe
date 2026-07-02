@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
-import { Loader2, Github, Mail } from 'lucide-react';
+import { Loader2, GitBranch, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
