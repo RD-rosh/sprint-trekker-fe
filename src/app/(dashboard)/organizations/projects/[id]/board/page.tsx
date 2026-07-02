@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Settings, Users } from 'lucide-react';
 import { toast } from 'sonner';
+import { auth } from '@/lib/firebase';
 
 export default function ProjectBoardPage() {
     const params = useParams();
@@ -18,11 +19,13 @@ export default function ProjectBoardPage() {
     useEffect(() => {
         const fetchProject = async () => {
             try {
+                const token = await auth.currentUser?.getIdToken();
                 const res = await fetch(`/api/projects/${projectId}`, {
                     headers: {
-                        Authorization: `Bearer ${await /* get token from firebase */ ''}`,
+                        Authorization: `Bearer ${token}`,
                     },
                 });
+                if (!res.ok) throw new Error('Failed to fetch');
                 const data = await res.json();
                 setProject(data);
             } catch (error) {

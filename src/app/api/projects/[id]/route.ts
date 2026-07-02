@@ -1,36 +1,30 @@
-// import { NextRequest, NextResponse } from 'next/server';
-
-// export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-//     const { id } = params;
-//     // Call your NestJS backend
-//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, {
-//         headers: { Authorization: `Bearer ${req.headers.get('authorization')?.split('Bearer ')[1]}` },
-//     });
-//     return NextResponse.json(await res.json());
-// }
-
 import { NextRequest, NextResponse } from 'next/server';
+import { adminAuth } from '@/lib/firebase-admin';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export async function POST(req: NextRequest) {
+export async function GET(
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
     try {
-        const token = req.headers.get('authorization');
-        const body = await req.json();
+        const { id } = await params;
+        const token = req.headers.get('authorization')?.split('Bearer ')[1];
+        if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const res = await fetch(`${API_BASE}/projects`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: token || '',
-            },
-            body: JSON.stringify(body),
+        await adminAuth.verifyIdToken(token);
+
+        const res = await fetch(`${API_BASE}/projects/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
         });
 
+        if (!res.ok) {
+            return NextResponse.json({ error: 'Project not found' }, { status: res.status });
+        }
+
         const data = await res.json();
-        return NextResponse.json(data, { status: res.status });
+        return NextResponse.json(data);
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Failed to create project' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch project' }, { status: 500 });
     }
 }

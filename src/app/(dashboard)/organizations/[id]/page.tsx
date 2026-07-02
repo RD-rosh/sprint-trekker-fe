@@ -119,7 +119,7 @@ export default function OrganizationPage() {
                             <Card
                                 key={project._id}
                                 className="bg-zinc-900 border-zinc-800 hover:border-blue-500 transition-colors cursor-pointer"
-                                onClick={() => router.push(`/projects/${project._id}/board`)}
+                                onClick={() => router.push(`/organizations/projects/${project._id}/board`)}
                             >
                                 <CardHeader>
                                     <CardTitle>{project.name}</CardTitle>
