@@ -60,7 +60,17 @@ export default function KanbanBoard({ projectId }: { projectId: string }) {
 
         const activeIssue = issues.find(i => i._id === active.id);
         if (!activeIssue) return;
-        const newStatus = over.id as string; // Column ID
+
+        // Resolve new status — either from column ID or from target card's status
+        let newStatus = over.id as string;
+        const overIssue = issues.find(i => i._id === over.id);
+        if (overIssue) {
+            newStatus = overIssue.status;
+        }
+
+        // Validate against columns
+        const isValidStatus = columns.some(col => col.id === newStatus);
+        if (!isValidStatus) return;
 
         if (activeIssue.status !== newStatus) {
             // Optimistic update
